@@ -4,9 +4,20 @@ from typing import List, Dict, Any, Optional, Tuple
 from PIL import Image, ImageChops, ImageEnhance
 import numpy as np
 
+import cv2
+import hashlib
+
 ARTIFACTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "artifacts")
 HEATMAPS_DIR = os.path.join(ARTIFACTS_DIR, "heatmaps")
+FRAMES_DIR = os.path.join(ARTIFACTS_DIR, "frames")
 os.makedirs(HEATMAPS_DIR, exist_ok=True)
+os.makedirs(FRAMES_DIR, exist_ok=True)
+
+def is_video_file(file_path: str) -> bool:
+    if not file_path:
+        return False
+    ext = os.path.splitext(file_path)[1].lower()
+    return ext in [".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v"]
 
 def get_media_info(file_path: str) -> Dict[str, Any]:
     """
@@ -26,6 +37,33 @@ def get_media_info(file_path: str) -> Dict[str, Any]:
         "file_size_kb": round(os.path.getsize(file_path) / 1024, 1)
     }
 
+    if is_video_file(file_path):
+        try:
+            cap = cv2.VideoCapture(file_path)
+            if cap.isOpened():
+                w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+                frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                duration = round(frame_count / fps, 2) if fps > 0 else 0.0
+
+                fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
+                codec = "".join([chr((fourcc >> 8 * i) & 0xFF) for i in range(4)]).strip()
+
+                cap.release()
+
+                info["width"] = w
+                info["height"] = h
+                info["resolution"] = f"{w}x{h}"
+                info["fps"] = round(fps, 2)
+                info["frame_count"] = frame_count
+                info["duration_sec"] = duration
+                info["format"] = "VIDEO"
+                info["codec"] = codec or "mp4v"
+                return info
+        except Exception as e:
+            print(f"Error reading video info: {e}")
+
     try:
         with Image.open(file_path) as img:
             w, h = img.size
@@ -41,6 +79,74 @@ def get_media_info(file_path: str) -> Dict[str, Any]:
         info["format"] = "VIDEO"
 
     return info
+
+def extract_frames(video_path: str, max_frames: int = 32, target_fps: float = 1.0) -> List[Dict[str, Any]]:
+    """
+    Extracts frames from video, sampling 1 frame per second (capped at max_frames).
+    Saves frames to artifacts/frames/{video_id}/frame_{i}.jpg.
+    Returns list of metadata dicts with frame index, timestamp, path, and url.
+    """
+    if not video_path or not os.path.exists(video_path):
+        return []
+
+    base_name = os.path.splitext(os.path.basename(video_path))[0]
+    hash_id = hashlib.md5(video_path.encode()).hexdigest()[:8]
+    video_id = f"{base_name}_{hash_id}"
+    video_frames_dir = os.path.join(FRAMES_DIR, video_id)
+    os.makedirs(video_frames_dir, exist_ok=True)
+
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        return []
+
+    fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if total_frames <= 0:
+        cap.release()
+        return []
+
+    duration_sec = total_frames / fps
+
+    # Determine frame indices to sample
+    if duration_sec <= max_frames:
+        # Sample at target_fps (approx 1 frame per second)
+        step = max(1, int(round(fps / target_fps)))
+        target_indices = list(range(0, total_frames, step))[:max_frames]
+    else:
+        # Spread max_frames evenly across duration
+        step = max(1, total_frames // max_frames)
+        target_indices = [i * step for i in range(max_frames) if i * step < total_frames]
+
+    extracted_frames = []
+    w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    for sample_idx, frame_idx in enumerate(target_indices):
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
+        ret, frame = cap.read()
+        if not ret or frame is None:
+            continue
+
+        timestamp = round(frame_idx / fps, 2)
+        out_filename = f"frame_{sample_idx}.jpg"
+        out_path = os.path.join(video_frames_dir, out_filename)
+
+        # Write frame to artifacts
+        cv2.imwrite(out_path, frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+
+        extracted_frames.append({
+            "frameIndex": sample_idx,
+            "videoFrameIdx": frame_idx,
+            "timestamp": timestamp,
+            "timeFormatted": f"{int(timestamp // 60):02d}:{int(timestamp % 60):02d}",
+            "path": out_path,
+            "url": f"/artifacts/frames/{video_id}/{out_filename}",
+            "width": w,
+            "height": h
+        })
+
+    cap.release()
+    return extracted_frames
 
 def compute_quality_score(media_info: Dict[str, Any]) -> float:
     """

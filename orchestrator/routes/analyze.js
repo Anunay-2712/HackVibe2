@@ -6,8 +6,17 @@ import { runAllAgents } from '../services/agentRunner.js';
 import { computeFusion } from '../services/fusion.js';
 import { recordAnalysis } from '../services/statsService.js';
 
+import path from 'path';
+
+const storage = multer.diskStorage({
+  destination: 'uploads/',
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname) || '';
+    cb(null, `${uuidv4()}${ext}`);
+  }
+});
+const upload = multer({ storage, limits: { fileSize: 100 * 1024 * 1024 } });
 const router = express.Router();
-const upload = multer({ dest: 'uploads/', limits: { fileSize: 100 * 1024 * 1024 } }); // 100MB limit
 
 router.post('/', upload.single('file'), (req, res) => {
   const analysisId = uuidv4();

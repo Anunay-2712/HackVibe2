@@ -11,19 +11,19 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-white/[0.03] backdrop-blur-md border border-white/10 shadow-xl;
+    @apply bg-white border border-[#E2E8F0] shadow-[0_1px_3px_rgba(15,23,42,0.06)] rounded-2xl;
   }
   
   .glow-cyan {
-    @apply shadow-[0_0_15px_rgba(34,211,238,0.15)];
+    @apply shadow-[0_2px_8px_rgba(79,70,229,0.08)];
   }
   
   .glow-violet {
-    @apply shadow-[0_0_15px_rgba(139,92,246,0.15)];
+    @apply shadow-[0_2px_8px_rgba(79,70,229,0.08)];
   }
   
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-violet-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#4F46E5] to-[#7C3AED];
   }
 }
 
@@ -34,14 +34,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(10, 15, 28, 1);
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: #CBD5E1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #94A3B8;
 }
