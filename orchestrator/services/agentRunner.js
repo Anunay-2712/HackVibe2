@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import path from 'path';
 
 const AGENTS = [
   { name: 'pixel_forensics', track: 'media' },
@@ -12,6 +13,7 @@ const AGENTS = [
 ];
 
 export async function runAllAgents(analysisId, filePath, inputType, sampleName, onAgentDone) {
+  const absolutePath = filePath ? path.resolve(filePath) : null;
   const agentPromises = AGENTS.map(async (agent) => {
     try {
       const response = await fetch(`http://localhost:8000/agents/${agent.name}`, {
@@ -19,7 +21,7 @@ export async function runAllAgents(analysisId, filePath, inputType, sampleName, 
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ file_path: filePath, sample_name: sampleName, input_type: inputType })
+        body: JSON.stringify({ file_path: absolutePath, sample_name: sampleName, input_type: inputType })
       });
       
       if (!response.ok) {

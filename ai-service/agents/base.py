@@ -15,13 +15,14 @@ async def execute_agent(agent_name, track, func, *args, **kwargs):
         
         result = await func(*args, **kwargs)
         
-        return AgentResult(
-            agent=agent_name,
-            track=track,
-            status="ok",
-            mock=MOCK_MODE,
-            **result
-        )
+        result_dict = {
+            "agent": agent_name,
+            "track": track,
+            "status": "ok",
+            "mock": MOCK_MODE,
+        }
+        result_dict.update(result)
+        return AgentResult(**result_dict)
     except Exception as e:
         print(f"Error in {agent_name}: {traceback.format_exc()}")
         return AgentResult(

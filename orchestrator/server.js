@@ -23,6 +23,21 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Proxy generated heatmaps and forensic artifacts to AI Service
+app.use('/artifacts', async (req, res) => {
+  try {
+    const aiRes = await fetch(`${AI_SERVICE_URL}/artifacts${req.url}`);
+    if (aiRes.ok) {
+      res.setHeader('Content-Type', aiRes.headers.get('content-type') || 'image/png');
+      const buffer = await aiRes.arrayBuffer();
+      return res.send(Buffer.from(buffer));
+    }
+  } catch (e) {
+    console.warn('Artifact proxy error:', e.message);
+  }
+  res.status(404).send('Artifact not found');
+});
+
 // Routes
 app.use('/api/analyze', analyzeRouter);
 

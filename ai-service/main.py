@@ -22,6 +22,8 @@ load_dotenv()
 
 app = FastAPI(title="DeepTrace AI Service (Mock)")
 
+from fastapi.staticfiles import StaticFiles
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,6 +31,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+ARTIFACTS_DIR = os.path.join(os.path.dirname(__file__), "artifacts")
+os.makedirs(ARTIFACTS_DIR, exist_ok=True)
+app.mount("/artifacts", StaticFiles(directory=ARTIFACTS_DIR), name="artifacts")
 
 @app.get("/health")
 async def health_check():
