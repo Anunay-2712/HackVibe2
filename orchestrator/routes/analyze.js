@@ -27,12 +27,20 @@ router.post('/', upload.single('file'), (req, res) => {
   let inputType = 'unknown';
 
   if (req.file) {
-    if (!req.file.mimetype.startsWith('video/') && !req.file.mimetype.startsWith('image/')) {
-        return res.status(400).json({ error: 'Invalid file type' });
+    const isMedia = req.file.mimetype.startsWith('video/') ||
+                    req.file.mimetype.startsWith('image/') ||
+                    req.file.mimetype.startsWith('audio/') ||
+                    /\.(mp3|wav|ogg|m4a|aac|mp4|mov|jpg|jpeg|png|webp)$/i.test(req.file.originalname);
+    if (!isMedia) {
+        return res.status(400).json({ error: 'Invalid file type. Please upload a video, audio, or image file.' });
     }
     inputInfo = { file: req.file.originalname, mimetype: req.file.mimetype };
     filePath = req.file.path;
-    inputType = req.file.mimetype.startsWith('video/') ? 'video' : 'image';
+    inputType = req.file.mimetype.startsWith('video/')
+      ? 'video'
+      : (req.file.mimetype.startsWith('audio/') || /\.(mp3|wav|ogg|m4a|aac)$/i.test(req.file.originalname))
+      ? 'audio'
+      : 'image';
   } else if (req.body && (req.body.text || req.body.url)) {
     inputInfo = { text: req.body.text, url: req.body.url };
     inputType = req.body.text ? 'text' : 'url';

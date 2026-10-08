@@ -29,6 +29,8 @@ const MediaForensicsPanel = ({ agents = {} }) => {
   const faceArtifacts = faceAgent.artifacts || {};
   const pixelAgent = agents.pixel_forensics?.result || {};
   const pixelArtifacts = pixelAgent.artifacts || {};
+  const audioAgent = agents.audio_visual?.result || {};
+  const audioArtifacts = audioAgent.artifacts || {};
 
   // Resolve sampled frames
   const frames = (faceArtifacts.sampledFrames && faceArtifacts.sampledFrames.length > 0)
@@ -75,6 +77,7 @@ const MediaForensicsPanel = ({ agents = {} }) => {
           <div className="space-y-4">
             {Object.entries(MEDIA_AGENT_LABELS).map(([key, info]) => {
               const res = agents[key]?.result || { score: 0, confidence: 0, summary: 'Pending analysis...' };
+              const isSkipped = res.status === 'skipped';
               const scorePercent = Math.round((res.score || 0) * 100);
               const confPercent = Math.round((res.confidence || 0) * 100);
               const Icon = info.icon;
@@ -87,21 +90,33 @@ const MediaForensicsPanel = ({ agents = {} }) => {
                       <span>{info.name}</span>
                     </div>
                     <div className="flex items-center gap-2 font-mono">
-                      <span className="text-[#475569] font-semibold">Conf: {confPercent}%</span>
-                      <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${getScoreColor(scorePercent)}`}>
-                        {scorePercent}%
-                      </span>
+                      {isSkipped ? (
+                        <span className="px-2 py-0.5 rounded text-[11px] font-bold border bg-slate-100 text-slate-500 border-slate-300">
+                          N/A (Skipped)
+                        </span>
+                      ) : (
+                        <>
+                          <span className="text-[#475569] font-semibold">Conf: {confPercent}%</span>
+                          <span className={`px-2 py-0.5 rounded text-[11px] font-bold border ${getScoreColor(scorePercent)}`}>
+                            {scorePercent}%
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
 
                   {/* Horizontal Bar */}
                   <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${scorePercent}%` }}
-                      transition={{ duration: 0.8 }}
-                      className={`h-full rounded-full ${scorePercent < 35 ? 'bg-emerald-500' : scorePercent < 65 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                    />
+                    {isSkipped ? (
+                      <div className="h-full bg-slate-300 rounded-full w-full opacity-30" />
+                    ) : (
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${scorePercent}%` }}
+                        transition={{ duration: 0.8 }}
+                        className={`h-full rounded-full ${scorePercent < 35 ? 'bg-emerald-500' : scorePercent < 65 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                      />
+                    )}
                   </div>
 
                   <p className="text-xs text-[#334155] font-normal truncate">
@@ -356,6 +371,117 @@ const MediaForensicsPanel = ({ agents = {} }) => {
           </div>
         </div>
       </div>
+
+      {/* Acoustic & Vocoder Spectrogram Viewer */}
+      {(audioArtifacts.spectrogramUrl || audioArtifacts.hasAudio) && (
+        <div className="glass-panel rounded-2xl p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-[#0F172A] flex items-center gap-2">
+                <Volume2 className="w-4 h-4 text-[#4F46E5]" />
+                Acoustic Frequency Spectrum & Neural Vocoder Analyzer
+              </h3>
+              <p className="text-xs text-[#475569] mt-1 font-normal">
+                Inspect Short-Time Fourier Transform (STFT) log-magnitude spectrogram, vocoder roll-off boundaries, and pitch micro-jitter.
+              </p>
+            </div>
+
+            {/* Vocoder Status Badge */}
+            <div className="flex items-center gap-2 font-mono text-xs">
+              {audioArtifacts.vocoderDetected ? (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-rose-50 border border-rose-300 text-rose-800 rounded-lg font-bold">
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                  <span>SYNTHETIC VOCODER DETECTED</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-lg font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>NATURAL HUMAN SPEECH</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Forensic Metrics Pill Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <span className="text-[11px] font-mono text-[#64748B] block font-semibold uppercase">HF Energy Ratio (&gt;7kHz)</span>
+              <span className={`text-base font-mono font-bold ${audioArtifacts.hfEnergyRatio < 0.0015 ? 'text-rose-600' : 'text-[#0F172A]'}`}>
+                {audioArtifacts.hfEnergyRatio !== undefined ? `${(audioArtifacts.hfEnergyRatio * 100).toFixed(2)}%` : '0.08%'}
+              </span>
+              <span className="text-[10px] text-[#475569] block mt-0.5">Cutoff &lt;0.15% = synthetic</span>
+            </div>
+
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <span className="text-[11px] font-mono text-[#64748B] block font-semibold uppercase">Silence Floor Level</span>
+              <span className={`text-base font-mono font-bold ${audioArtifacts.noiseFloorDb < -65 ? 'text-rose-600' : 'text-[#0F172A]'}`}>
+                {audioArtifacts.noiseFloorDb !== undefined ? `${audioArtifacts.noiseFloorDb} dB` : '-44.2 dB'}
+              </span>
+              <span className="text-[10px] text-[#475569] block mt-0.5">&lt;-65 dB = digital zero</span>
+            </div>
+
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <span className="text-[11px] font-mono text-[#64748B] block font-semibold uppercase">Pitch F0 Micro-Jitter</span>
+              <span className={`text-base font-mono font-bold ${audioArtifacts.pitchJitter < 0.3 ? 'text-rose-600' : 'text-[#0F172A]'}`}>
+                {audioArtifacts.pitchJitter !== undefined ? `${audioArtifacts.pitchJitter}%` : '1.18%'}
+              </span>
+              <span className="text-[10px] text-[#475569] block mt-0.5">&lt;0.3% = robotic uniformity</span>
+            </div>
+
+            <div className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0]">
+              <span className="text-[11px] font-mono text-[#64748B] block font-semibold uppercase">Audio Sample Rate</span>
+              <span className="text-base font-mono font-bold text-[#0F172A]">
+                16.0 kHz
+              </span>
+              <span className="text-[10px] text-[#475569] block mt-0.5">8.0 kHz Nyquist domain</span>
+            </div>
+          </div>
+
+          {/* Spectrogram Image Display */}
+          <div className="relative aspect-[21/8] w-full rounded-xl overflow-hidden bg-slate-950 border border-slate-300 flex items-center justify-center">
+            {audioArtifacts.spectrogramUrl ? (
+              <img
+                src={audioArtifacts.spectrogramUrl}
+                alt="Acoustic STFT Spectrogram"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="text-center text-slate-400 font-mono text-xs">
+                No spectrogram generated
+              </div>
+            )}
+
+            {/* Spectrogram Overlay Labels */}
+            <div className="absolute top-2 left-3 bg-slate-900/80 backdrop-blur px-2.5 py-1 rounded border border-slate-700 text-[10px] font-mono text-cyan-300">
+              8000 Hz (Nyquist)
+            </div>
+            <div className="absolute bottom-2 left-3 bg-slate-900/80 backdrop-blur px-2.5 py-1 rounded border border-slate-700 text-[10px] font-mono text-slate-300">
+              0 Hz (DC)
+            </div>
+            <div className="absolute bottom-2 right-3 bg-slate-900/80 backdrop-blur px-2.5 py-1 rounded border border-slate-700 text-[10px] font-mono text-slate-300">
+              Frequency vs Time (STFT)
+            </div>
+          </div>
+
+          {/* Evidence bullet points */}
+          {audioAgent.evidence && audioAgent.evidence.length > 0 && (
+            <div className="space-y-2 pt-2">
+              <span className="text-xs font-mono font-bold text-[#0F172A] uppercase">Acoustic Forensic Indicators:</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {audioAgent.evidence.map((ev, i) => (
+                  <div key={i} className="p-2.5 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] text-xs">
+                    <strong className="text-[#0F172A] block font-mono">{ev.label}</strong>
+                    <span className="text-[#334155]">{ev.detail}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

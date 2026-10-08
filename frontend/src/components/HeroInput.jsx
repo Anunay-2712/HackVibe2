@@ -38,11 +38,15 @@ const HeroInput = ({ selectedToolMode }) => {
       return;
     }
 
-    // Validate type (MP4, MOV, JPG, PNG)
-    const validTypes = ['video/mp4', 'video/quicktime', 'image/jpeg', 'image/png'];
-    const validExtensions = /\.(mp4|mov|jpg|jpeg|png)$/i;
+    // Validate type (MP4, MOV, JPG, PNG, MP3, WAV, etc.)
+    const validTypes = [
+      'video/mp4', 'video/quicktime', 'video/webm', 'video/x-matroska',
+      'image/jpeg', 'image/png', 'image/webp',
+      'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/m4a', 'audio/x-m4a', 'audio/aac'
+    ];
+    const validExtensions = /\.(mp4|mov|avi|mkv|webm|jpg|jpeg|png|webp|mp3|wav|m4a|ogg|aac)$/i;
     if (!validTypes.includes(selected.type) && !validExtensions.test(selected.name)) {
-      setError('Please upload an MP4, MOV, JPG, or PNG file.');
+      setError('Please upload an MP4, MOV, JPG, PNG, MP3, or WAV file.');
       return;
     }
 
@@ -216,7 +220,7 @@ const HeroInput = ({ selectedToolMode }) => {
             <input
               ref={fileInputRef}
               type="file"
-              accept="video/mp4,video/quicktime,image/jpeg,image/png,.mp4,.mov,.jpg,.jpeg,.png"
+              accept="video/*,image/*,audio/*,.mp4,.mov,.jpg,.jpeg,.png,.mp3,.wav,.m4a,.ogg"
               className="hidden"
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
@@ -259,10 +263,10 @@ const HeroInput = ({ selectedToolMode }) => {
               <>
                 <UploadCloud className="w-8 h-8 text-[#4F46E5] mb-2" />
                 <span className="font-bold text-[16px] text-[#0F172A]">
-                  Drag and drop a video or image
+                  Drag and drop video, audio, or image
                 </span>
                 <span className="text-[12px] text-[#475569] mt-[4px]">
-                  MP4, MOV, JPG, PNG · up to 100 MB
+                  MP4, MP3, WAV, JPG, PNG · up to 100 MB
                 </span>
               </>
             )}

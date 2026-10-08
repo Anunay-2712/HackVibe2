@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 from utils.schema import EvidenceItem
-from utils.preprocessing import get_media_info, compute_quality_score, generate_ela_heatmap
+from utils.preprocessing import get_media_info, compute_quality_score, generate_ela_heatmap, is_audio_file
 from models_config import MOCK_MODE
 
 # Optional lightweight HF image pipeline cache
@@ -84,6 +84,17 @@ async def analyze(file_path: Optional[str] = None, sample_name: Optional[str] = 
             "score": 0.5,
             "confidence": 0.1,
             "summary": "No media file provided for pixel forensics.",
+            "evidence": [],
+            "artifacts": {},
+            "mock": False
+        }
+
+    if is_audio_file(file_path):
+        return {
+            "score": 0.0,
+            "confidence": 0.0,
+            "status": "skipped",
+            "summary": "Audio media input; spatial pixel forensics not applicable.",
             "evidence": [],
             "artifacts": {},
             "mock": False

@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from typing import Optional, List, Dict, Any
 from utils.schema import EvidenceItem
-from utils.preprocessing import is_video_file, get_media_info, compute_quality_score, extract_frames
+from utils.preprocessing import is_video_file, is_audio_file, get_media_info, compute_quality_score, extract_frames
 from models_config import YUNET_FACE_MODEL_PATH
 
 _detector = None
@@ -111,6 +111,17 @@ async def analyze(file_path: Optional[str] = None, sample_name: Optional[str] = 
             "score": 0.5,
             "confidence": 0.1,
             "summary": "No media file provided for face consistency analysis.",
+            "evidence": [],
+            "artifacts": {},
+            "mock": False
+        }
+
+    if is_audio_file(file_path):
+        return {
+            "score": 0.0,
+            "confidence": 0.0,
+            "status": "skipped",
+            "summary": "Audio media input; facial landmark geometry not applicable.",
             "evidence": [],
             "artifacts": {},
             "mock": False

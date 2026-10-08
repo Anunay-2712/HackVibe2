@@ -15,11 +15,11 @@ const Upload = () => {
   const navigate = useNavigate();
 
   const handleFileSelect = (file) => {
-    if (file && (file.type.startsWith('video/') || file.type.startsWith('image/'))) {
+    if (file && (file.type.startsWith('video/') || file.type.startsWith('image/') || file.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a)$/i.test(file.name))) {
       setSelectedFile(file);
       setError(null);
     } else {
-      setError('Please upload a video or image file.');
+      setError('Please upload a video, audio, or image file (MP4, MP3, WAV, JPG, PNG).');
     }
   };
 
@@ -118,14 +118,14 @@ const Upload = () => {
               ) : (
                 <>
                   <p className="text-gray-300 font-medium">Drag & drop your file here</p>
-                  <p className="text-gray-500 text-sm mt-2">Supports Video (MP4) and Image (JPEG, PNG)</p>
+                  <p className="text-gray-500 text-sm mt-2">Supports Video (MP4), Audio (MP3, WAV), and Image (JPEG, PNG)</p>
                 </>
               )}
               <input
                 ref={fileInputRef}
                 type="file"
                 className="hidden"
-                accept="video/*,image/*"
+                accept="video/*,image/*,audio/*,.mp3,.wav"
                 onChange={(e) => e.target.files[0] && handleFileSelect(e.target.files[0])}
               />
             </div>
