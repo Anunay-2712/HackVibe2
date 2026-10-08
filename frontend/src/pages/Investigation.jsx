@@ -10,10 +10,12 @@ import ClaimVerificationPanel from '../components/ClaimVerificationPanel';
 import JudgeReportView from '../components/JudgeReportView';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, Layers, Scan, FileText, Gavel, Cpu, RotateCcw, ArrowLeft } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const Investigation = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { agents, fusion, report, status, logs } = useSSE(id);
   const [activeTab, setActiveTab] = useState('verdict');
   const [initialData, setInitialData] = useState(null);
@@ -34,10 +36,10 @@ const Investigation = () => {
   const isDone = status === 'done' || Boolean(effectiveFusion);
 
   const tabs = [
-    { id: 'verdict', label: 'Executive Verdict', icon: ShieldCheck, badge: isDone ? effectiveFusion?.verdict : null },
-    { id: 'media', label: 'Media Forensics', icon: Scan },
-    { id: 'claims', label: 'Claim Verification', icon: FileText },
-    { id: 'report', label: "Judge's Report", icon: Gavel },
+    { id: 'verdict', label: t('investigation.tabOverview', 'Executive Verdict'), icon: ShieldCheck, badge: isDone ? effectiveFusion?.verdict : null },
+    { id: 'media', label: t('investigation.tabMedia', 'Media Forensics'), icon: Scan },
+    { id: 'claims', label: t('investigation.tabClaims', 'Claim Verification'), icon: FileText },
+    { id: 'report', label: t('investigation.tabJudge', "Judge's Report"), icon: Gavel },
     { id: 'swarm', label: 'Agent Swarm Trace', icon: Cpu },
   ];
 
@@ -53,7 +55,7 @@ const Investigation = () => {
           <div>
             <div className="flex items-center gap-2 text-xs font-mono text-[#475569] mb-1 font-semibold">
               <Link to="/" className="text-[#4F46E5] hover:underline flex items-center gap-1 transition-colors">
-                <ArrowLeft className="w-3.5 h-3.5" /> Back to Upload
+                <ArrowLeft className="w-3.5 h-3.5" /> {t('investigation.backHome', 'Back to Upload')}
               </Link>
               <span>/</span>
               <span>Case ID: <span className="text-[#0F172A] font-bold">{id}</span></span>
@@ -74,12 +76,12 @@ const Investigation = () => {
             {isDone ? (
               <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-mono font-bold">
                 <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-                INVESTIGATION CONCLUDED
+                {t('investigation.statusComplete', 'INVESTIGATION CONCLUDED')}
               </div>
             ) : (
               <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-300 text-xs font-mono font-bold animate-pulse">
                 <span className="w-2 h-2 rounded-full bg-[#4F46E5] animate-ping"></span>
-                SWARM SCANNING IN PROGRESS...
+                {t('investigation.statusAnalyzing', 'SWARM SCANNING IN PROGRESS...')}
               </div>
             )}
 

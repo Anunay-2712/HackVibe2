@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 const FALLBACK_STORIES = [
   {
@@ -58,6 +59,7 @@ const FALLBACK_STORIES = [
 ];
 
 const NewsCarousel = () => {
+  const { t } = useLanguage();
   const [filter, setFilter] = useState('All');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [stories, setStories] = useState(FALLBACK_STORIES);
@@ -129,6 +131,12 @@ const NewsCarousel = () => {
 
   const currentStory = activeStories[currentIndex] || activeStories[0] || FALLBACK_STORIES[0];
 
+  const filterButtons = [
+    { id: 'All', label: t('news.filterAll', 'All') },
+    { id: 'India', label: t('news.filterIndia', 'India') },
+    { id: 'World', label: t('news.filterWorld', 'World') },
+  ];
+
   return (
     <section
       id="news"
@@ -144,38 +152,38 @@ const NewsCarousel = () => {
       {/* Card Header Row */}
       <div className="flex items-center justify-between mb-[12px]">
         <h3 className="text-[15px] font-bold text-[#0F172A] m-0">
-          Deepfake news worldwide
+          {t('news.title', 'Deepfake news worldwide')}
         </h3>
         <span className="text-[12px] text-[#475569] flex items-center gap-1.5 font-medium">
           <span className="w-2 h-2 rounded-full bg-[#16A34A] inline-block animate-pulse"></span>
-          Live
+          {t('news.live', 'Live')}
         </span>
       </div>
 
-      {/* Filter pills row (gap 6px) */}
+      {/* Filter pills row */}
       <div className="flex items-center gap-[6px] mb-[12px]" role="tablist" aria-label="News region filters">
-        {['All', 'India', 'World'].map((category) => {
-          const isActive = filter === category;
+        {filterButtons.map(({ id, label }) => {
+          const isActive = filter === id;
           return (
             <button
-              key={category}
+              key={id}
               type="button"
               role="tab"
               aria-selected={isActive}
-              onClick={() => setFilter(category)}
+              onClick={() => setFilter(id)}
               className={
                 isActive
                   ? 'bg-[#4F46E5] text-white border border-[#4F46E5] font-medium text-[13px] py-[8px] px-[14px] rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5] cursor-pointer'
                   : 'bg-white text-[#334155] border border-[#CBD5E1] font-medium text-[13px] py-[8px] px-[14px] rounded-full hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5] cursor-pointer'
               }
             >
-              {category}
+              {label}
             </button>
           );
         })}
       </div>
 
-      {/* Story card (white bg, 1px #E2E8F0 border, radius 12px, overflow hidden) */}
+      {/* Story card */}
       <article
         className="bg-white border border-[#E2E8F0] rounded-[12px] overflow-hidden"
         onTouchStart={(e) => {
@@ -190,7 +198,7 @@ const NewsCarousel = () => {
           touchStartX.current = null;
         }}
       >
-        {/* Image Area: aspect-ratio 16/9, object-cover with click-through to source */}
+        {/* Image Area */}
         <a
           href={currentStory.url || '#'}
           target="_blank"
@@ -213,8 +221,8 @@ const NewsCarousel = () => {
                 background: 'linear-gradient(135deg, #C7D2FE 0%, #A5F3FC 100%)'
               }}
             >
-              <span>{currentStory.source} Editorial Coverage</span>
-              <span className="text-[11px] text-[#4338CA] mt-1 font-mono">Click to view article ↗</span>
+              <span>{currentStory.source} {t('news.editorialCoverage', 'Editorial Coverage')}</span>
+              <span className="text-[11px] text-[#4338CA] mt-1 font-mono">{t('news.clickViewArticle', 'Click to view article ↗')}</span>
             </div>
           )}
           {/* Publisher tag badge */}
@@ -223,7 +231,7 @@ const NewsCarousel = () => {
           </div>
         </a>
 
-        {/* Body padding 14px */}
+        {/* Body */}
         <div className="p-[14px]">
           <h4 className="font-bold text-[15px] leading-[1.35] text-[#0F172A] line-clamp-3 mb-[6px]">
             <a
@@ -244,14 +252,13 @@ const NewsCarousel = () => {
             rel="noopener noreferrer"
             className="font-bold text-[13px] text-[#4F46E5] hover:underline inline-flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] rounded"
           >
-            Read at source →
+            {t('news.readSource', 'Read at source →')}
           </a>
         </div>
       </article>
 
-      {/* Controls row: space-between, margin-top 12px */}
+      {/* Controls row */}
       <div className="flex items-center justify-between mt-[12px]">
-        {/* Left pill button "←" */}
         <button
           type="button"
           onClick={handlePrev}
@@ -261,7 +268,6 @@ const NewsCarousel = () => {
           ←
         </button>
 
-        {/* Center pagination dots */}
         <div className="flex items-center gap-[6px]" aria-label="Pagination dots">
           {activeStories.map((_, idx) => (
             <button
@@ -278,7 +284,6 @@ const NewsCarousel = () => {
           ))}
         </div>
 
-        {/* Right pill button "→" */}
         <button
           type="button"
           onClick={handleNext}
@@ -289,10 +294,10 @@ const NewsCarousel = () => {
         </button>
       </div>
 
-      {/* Footnote, muted 12px, margin-top 10px */}
+      {/* Footnote */}
       {isFallback && (
         <p className="text-[12px] text-[#475569] mt-[10px]">
-          Sample news shown. Live feed loads via the backend.
+          {t('news.fallbackNotice', 'Sample news shown. Live feed loads via the backend.')}
         </p>
       )}
     </section>

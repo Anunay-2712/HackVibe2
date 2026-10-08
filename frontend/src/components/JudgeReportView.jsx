@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Gavel, CheckSquare, Square, Download, Printer, RotateCcw, Filter, AlertCircle, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 
 const JudgeReportView = ({ report, fusion, agents = {}, analysisId }) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [filterAgent, setFilterAgent] = useState('all');
   const [checklist, setChecklist] = useState({
     0: false,
@@ -217,7 +219,7 @@ const JudgeReportView = ({ report, fusion, agents = {}, analysisId }) => {
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-[#CBD5E1] text-xs font-mono font-bold text-[#0F172A] transition-all hover:border-[#4F46E5] cursor-pointer"
           >
             <Download className="w-4 h-4 text-[#4F46E5]" />
-            <span>Download Report (JSON)</span>
+            <span>{t('investigation.downloadDossier', 'Download Report (JSON)')}</span>
           </button>
 
           <button

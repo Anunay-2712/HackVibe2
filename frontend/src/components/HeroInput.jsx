@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UploadCloud, File, AlertCircle, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const HeroInput = ({ selectedToolMode }) => {
-  const [tab, setTab] = useState('Upload file'); // 'Upload file', 'Paste text or claim', 'Paste URL'
+  const { t } = useLanguage();
+  const [tab, setTab] = useState('upload'); // 'upload', 'claim', 'url'
   const [file, setFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [textContent, setTextContent] = useState('');
@@ -19,11 +21,11 @@ const HeroInput = ({ selectedToolMode }) => {
   React.useEffect(() => {
     if (!selectedToolMode) return;
     if (selectedToolMode === 'claim') {
-      setTab('Paste text or claim');
+      setTab('claim');
     } else if (selectedToolMode === 'url') {
-      setTab('Paste URL');
+      setTab('url');
     } else {
-      setTab('Upload file');
+      setTab('upload');
     }
   }, [selectedToolMode]);
 
@@ -34,7 +36,7 @@ const HeroInput = ({ selectedToolMode }) => {
     // Validate size (up to 100 MB)
     const MAX_SIZE = 100 * 1024 * 1024;
     if (selected.size > MAX_SIZE) {
-      setError('File exceeds 100 MB limit.');
+      setError(t('hero.errSize', 'File exceeds 100 MB limit.'));
       return;
     }
 
@@ -46,7 +48,7 @@ const HeroInput = ({ selectedToolMode }) => {
     ];
     const validExtensions = /\.(mp4|mov|avi|mkv|webm|jpg|jpeg|png|webp|mp3|wav|m4a|ogg|aac)$/i;
     if (!validTypes.includes(selected.type) && !validExtensions.test(selected.name)) {
-      setError('Please upload an MP4, MOV, JPG, PNG, MP3, or WAV file.');
+      setError(t('hero.errType', 'Please upload an MP4, MOV, JPG, PNG, MP3, or WAV file.'));
       return;
     }
 
@@ -74,9 +76,9 @@ const HeroInput = ({ selectedToolMode }) => {
     setIsSubmitting(true);
 
     try {
-      if (tab === 'Upload file') {
+      if (tab === 'upload') {
         if (!file) {
-          setError('Please select or drop a media file first.');
+          setError(t('hero.errSelectMedia', 'Please select or drop a media file first.'));
           setIsSubmitting(false);
           return;
         }
@@ -89,9 +91,9 @@ const HeroInput = ({ selectedToolMode }) => {
         } else {
           setError(data.error || 'Failed to start analysis.');
         }
-      } else if (tab === 'Paste text or claim') {
+      } else if (tab === 'claim') {
         if (!textContent.trim()) {
-          setError('Please enter a claim text to verify.');
+          setError(t('hero.errEnterClaim', 'Please enter a claim text to verify.'));
           setIsSubmitting(false);
           return;
         }
@@ -106,9 +108,9 @@ const HeroInput = ({ selectedToolMode }) => {
         } else {
           setError(data.error || 'Failed to start analysis.');
         }
-      } else if (tab === 'Paste URL') {
+      } else if (tab === 'url') {
         if (!urlContent.trim()) {
-          setError('Please provide a valid URL.');
+          setError(t('hero.errProvideUrl', 'Please provide a valid URL.'));
           setIsSubmitting(false);
           return;
         }
@@ -158,33 +160,39 @@ const HeroInput = ({ selectedToolMode }) => {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const tabsList = [
+    { id: 'upload', label: t('hero.tabUpload', 'Upload file') },
+    { id: 'claim', label: t('hero.tabClaim', 'Paste text or claim') },
+    { id: 'url', label: t('hero.tabUrl', 'Paste URL') },
+  ];
+
   return (
     <div className="flex flex-col gap-[20px]">
-      {/* 1. Hero (centered, padding 8px 24px 0) */}
+      {/* 1. Hero */}
       <div className="text-center pt-[8px] px-[24px] pb-0">
-        <h1 className="text-[38px] leading-[1.15] font-bold text-[#0F172A] tracking-tight sm:text-[38px] max-sm:text-[30px]">
-          Investigate the media.
-          <span className="text-[#4F46E5] block">Verify the message.</span>
+        <h1 className="text-[38px] leading-[1.2] font-bold text-[#0F172A] tracking-tight sm:text-[38px] max-sm:text-[28px]">
+          {t('hero.titleLine1', 'Investigate the media.')}
+          <span className="text-[#4F46E5] block">{t('hero.titleLine2', 'Verify the message.')}</span>
         </h1>
         <p className="text-[15px] text-[#475569] mt-[12px] max-w-xl mx-auto leading-relaxed">
-          A swarm of AI agents checks video, image, audio and claims, then explains its verdict.
+          {t('hero.subtitle', 'A swarm of AI agents checks video, image, audio and claims, then explains its verdict.')}
         </p>
       </div>
 
-      {/* 2. Input card (white bg, radius 20px, padding 22px, shadow 0 8px 24px rgba(79,70,229,.10), 1px #E2E8F0 border) */}
+      {/* 2. Input card */}
       <div className="bg-white rounded-[20px] p-[22px] shadow-[0_8px_24px_rgba(79,70,229,0.10)] border border-[#E2E8F0]">
-        {/* Tabs row (gap 8px, margin-bottom 14px) as pills */}
+        {/* Tabs row */}
         <div className="flex flex-wrap gap-[8px] mb-[14px]" role="tablist" aria-label="Input mode">
-          {['Upload file', 'Paste text or claim', 'Paste URL'].map((tabName) => {
-            const isActive = tab === tabName;
+          {tabsList.map((tabItem) => {
+            const isActive = tab === tabItem.id;
             return (
               <button
-                key={tabName}
+                key={tabItem.id}
                 type="button"
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => {
-                  setTab(tabName);
+                  setTab(tabItem.id);
                   setError('');
                 }}
                 className={
@@ -193,14 +201,14 @@ const HeroInput = ({ selectedToolMode }) => {
                     : 'bg-white text-[#334155] border border-[#CBD5E1] font-medium text-[13px] py-[8px] px-[14px] rounded-full hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5] cursor-pointer'
                 }
               >
-                {tabName}
+                {tabItem.label}
               </button>
             );
           })}
         </div>
 
         {/* Tab 1: Dropzone */}
-        {tab === 'Upload file' && (
+        {tab === 'upload' && (
           <div
             onClick={() => fileInputRef.current?.click()}
             onDragOver={(e) => {
@@ -250,23 +258,23 @@ const HeroInput = ({ selectedToolMode }) => {
                     type="button"
                     onClick={clearFile}
                     aria-label="Remove selected file"
-                    className="p-1 hover:bg-gray-200 rounded-full text-gray-500"
+                    className="p-1 hover:bg-gray-200 rounded-full text-gray-500 cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
                 <span className="text-[12px] text-[#475569]">
-                  {(file.size / (1024 * 1024)).toFixed(2)} MB · Ready for investigation
+                  {(file.size / (1024 * 1024)).toFixed(2)} MB · {t('hero.readyForInvestigation', 'Ready for investigation')}
                 </span>
               </div>
             ) : (
               <>
                 <UploadCloud className="w-8 h-8 text-[#4F46E5] mb-2" />
                 <span className="font-bold text-[16px] text-[#0F172A]">
-                  Drag and drop video, audio, or image
+                  {t('hero.dropzoneTitle', 'Drag and drop video, audio, or image')}
                 </span>
                 <span className="text-[12px] text-[#475569] mt-[4px]">
-                  MP4, MP3, WAV, JPG, PNG · up to 100 MB
+                  {t('hero.dropzoneSubtitle', 'MP4, MP3, WAV, JPG, PNG · up to 100 MB')}
                 </span>
               </>
             )}
@@ -274,25 +282,25 @@ const HeroInput = ({ selectedToolMode }) => {
         )}
 
         {/* Tab 2: Paste text or claim */}
-        {tab === 'Paste text or claim' && (
+        {tab === 'claim' && (
           <div className="min-h-[148px] flex flex-col">
             <textarea
               value={textContent}
               onChange={(e) => setTextContent(e.target.value)}
-              placeholder="Paste speech transcript, viral post, or factual assertion to verify..."
+              placeholder={t('hero.textareaPlaceholder', 'Paste speech transcript, viral post, or factual assertion to verify...')}
               className="w-full h-[148px] p-3 rounded-[14px] border border-[#CBD5E1] text-[14px] text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent resize-none font-sans"
             />
           </div>
         )}
 
         {/* Tab 3: Paste URL */}
-        {tab === 'Paste URL' && (
+        {tab === 'url' && (
           <div className="min-h-[148px] flex flex-col justify-center">
             <input
               type="url"
               value={urlContent}
               onChange={(e) => setUrlContent(e.target.value)}
-              placeholder="https://example.com/video-or-article-url"
+              placeholder={t('hero.urlPlaceholder', 'https://example.com/video-or-post...')}
               className="w-full p-3.5 rounded-[14px] border border-[#CBD5E1] text-[14px] text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent font-sans"
             />
             <span className="text-[12px] text-[#475569] mt-2 px-1">
@@ -309,33 +317,33 @@ const HeroInput = ({ selectedToolMode }) => {
           </div>
         )}
 
-        {/* Bottom row (space-between, margin-top 14px) */}
+        {/* Bottom row */}
         <div className="flex flex-wrap items-center justify-between gap-3 mt-[14px]">
           {/* Left group: muted "Try a sample:" + pills */}
           <div className="flex flex-wrap items-center gap-[6px]">
             <span className="text-[12px] text-[#475569] font-medium mr-[2px]">
-              Try a sample:
+              {t('hero.trySample', 'Try a sample:')}
             </span>
             <button
               type="button"
               onClick={() => handleSample('authentic_clip')}
               className="bg-white text-[#334155] border border-[#CBD5E1] font-medium text-[13px] py-[8px] px-[14px] rounded-full hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5] cursor-pointer"
             >
-              Authentic clip
+              {t('hero.sampleAuthentic', 'Authentic clip')}
             </button>
             <button
               type="button"
               onClick={() => handleSample('ai_generated_image')}
               className="bg-white text-[#334155] border border-[#CBD5E1] font-medium text-[13px] py-[8px] px-[14px] rounded-full hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5] cursor-pointer"
             >
-              AI image
+              {t('hero.sampleAiImage', 'AI Image')}
             </button>
             <button
               type="button"
               onClick={() => handleSample('voice_clone_false_claim')}
               className="bg-white text-[#334155] border border-[#CBD5E1] font-medium text-[13px] py-[8px] px-[14px] rounded-full hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5] cursor-pointer"
             >
-              Voice clone
+              {t('hero.sampleVoiceClone', 'Voice clone')}
             </button>
           </div>
 
@@ -346,14 +354,14 @@ const HeroInput = ({ selectedToolMode }) => {
             disabled={isSubmitting}
             className="bg-[#4F46E5] hover:bg-[#4338CA] text-white font-bold text-[14px] py-[12px] px-[20px] rounded-[10px] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:ring-offset-2 disabled:opacity-60 cursor-pointer ml-auto"
           >
-            {isSubmitting ? 'Analyzing...' : 'Analyze'}
+            {isSubmitting ? t('hero.analyzingBtn', 'Analyzing...') : t('hero.analyzeBtn', 'Analyze')}
           </button>
         </div>
       </div>
 
       {/* 3. Centered muted note */}
       <p className="text-center text-[12px] text-[#475569] -mt-[8px]">
-        Results are probabilistic. DeepTrace shows evidence, not certainty.
+        {t('hero.disclaimer', 'Results are probabilistic. DeepTrace shows evidence, not certainty.')}
       </p>
     </div>
   );

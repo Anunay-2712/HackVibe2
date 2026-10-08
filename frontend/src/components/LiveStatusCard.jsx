@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 const AGENTS_LIST = [
   { key: 'pixel', label: 'Pixel' },
@@ -10,6 +11,7 @@ const AGENTS_LIST = [
 ];
 
 const LiveStatusCard = () => {
+  const { t } = useLanguage();
   const [stats, setStats] = useState(null);
   const [health, setHealth] = useState(null);
   const [isOffline, setIsOffline] = useState(false);
@@ -81,7 +83,7 @@ const LiveStatusCard = () => {
       <div className="flex items-center justify-between mb-[12px]">
         <div className="flex items-center gap-2">
           <h3 className="text-[15px] font-bold text-[#0F172A] m-0">
-            Live system status
+            {t('sidebar.liveStatusTitle', 'Live system status')}
           </h3>
           {isMockMode && (
             <span className="text-[10px] font-mono font-bold bg-[#EEF2FF] text-[#4F46E5] border border-[#C7D2FE] px-1.5 py-0.5 rounded">
@@ -96,15 +98,15 @@ const LiveStatusCard = () => {
               isOffline ? 'bg-[#DC2626]' : 'bg-[#16A34A]'
             }`}
           />
-          {isOffline ? 'Offline' : `Updated ${secondsAgo}s ago`}
+          {isOffline ? 'Offline' : `${secondsAgo}s ago`}
         </span>
       </div>
 
-      {/* Two stat tiles side by side (white tiles, label 12px muted, value 700 20px) */}
+      {/* Two stat tiles side by side */}
       <div className="grid grid-cols-2 gap-[10px] mb-[12px]">
         <div className="bg-white border border-[#E2E8F0] rounded-[10px] p-[10px]">
           <span className="text-[12px] text-[#475569] block mb-1">
-            Analyses today
+            {t('sidebar.analysesToday', 'Analyses today')}
           </span>
           <span className="text-[20px] font-bold text-[#0F172A] font-sans">
             {isOffline ? '—' : analysesToday}
@@ -113,7 +115,7 @@ const LiveStatusCard = () => {
 
         <div className="bg-white border border-[#E2E8F0] rounded-[10px] p-[10px]">
           <span className="text-[12px] text-[#475569] block mb-1">
-            Avg. time
+            {t('sidebar.avgTime', 'Avg. time')}
           </span>
           <span className="text-[20px] font-bold text-[#0F172A] font-sans">
             {isOffline ? '—' : avgTime}
@@ -121,10 +123,10 @@ const LiveStatusCard = () => {
         </div>
       </div>
 
-      {/* Muted "Verdict mix" label and 10px-high rounded stacked bar */}
+      {/* Muted "Verdict mix" label and stacked bar */}
       <div className="mb-[14px]">
         <div className="flex justify-between items-center text-[12px] text-[#475569] mb-[6px]">
-          <span>Verdict mix</span>
+          <span>{t('sidebar.verdictMix', 'Verdict mix')}</span>
           {totalVerdicts > 0 && (
             <span className="font-mono text-[11px] text-[#94A3B8]">
               {realCount}R / {inconclusiveCount}I / {fakeCount}F
@@ -151,10 +153,10 @@ const LiveStatusCard = () => {
         </div>
       </div>
 
-      {/* Muted "Agent health" label and wrapping row of 12px items with status dot */}
+      {/* Muted "Agent health" label */}
       <div>
         <span className="text-[12px] text-[#475569] block mb-[6px]">
-          Agent health
+          {t('sidebar.agentHealth', 'Agent health')}
         </span>
         <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[12px] text-[#334155]">
           {AGENTS_LIST.map(({ key, label }) => (
