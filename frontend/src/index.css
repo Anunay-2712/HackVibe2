@@ -4,7 +4,8 @@
 
 @layer base {
   body {
-    @apply bg-background text-gray-100 min-h-screen;
+    @apply bg-white text-[#0F172A] min-h-screen font-sans;
+    font-family: 'DM Sans', sans-serif;
   }
 }
 

@@ -1,0 +1,16 @@
+{
+  "analysesToday": 14,
+  "durations": [
+    2.1,
+    1.9,
+    2.4,
+    2
+  ],
+  "avgTime": "2.1s",
+  "verdictMix": {
+    "real": 6,
+    "inconclusive": 3,
+    "fake": 5
+  },
+  "lastUpdated": "2026-10-08T05:54:44.963Z"
+}

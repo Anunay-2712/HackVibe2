@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { createAnalysis, getAnalysis, updateAgent, setFusion, setReport, listSamples } from '../store.js';
 import { runAllAgents } from '../services/agentRunner.js';
 import { computeFusion } from '../services/fusion.js';
+import { recordAnalysis } from '../services/statsService.js';
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/', limits: { fileSize: 100 * 1024 * 1024 } }); // 100MB limit
@@ -39,6 +40,7 @@ router.post('/', upload.single('file'), (req, res) => {
     if (fusionResult.judgeReport) {
       setReport(analysisId, fusionResult.judgeReport);
     }
+    recordAnalysis(fusionResult.verdict, 2.3);
   });
 
   res.json({ analysisId });
@@ -64,6 +66,7 @@ router.post('/sample/:name', (req, res) => {
     if (fusionResult.judgeReport) {
       setReport(analysisId, fusionResult.judgeReport);
     }
+    recordAnalysis(fusionResult.verdict, 2.1);
   });
 
   res.json({ analysisId });
