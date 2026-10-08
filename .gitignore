@@ -45,6 +45,7 @@ orchestrator/uploads/*
 !orchestrator/uploads/.gitkeep
 ai-service/uploads/*
 ai-service/artifacts/*
+ai-service/bin/
 
 # Editor directories and files
 .vscode/*

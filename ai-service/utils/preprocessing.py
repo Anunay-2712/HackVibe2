@@ -10,14 +10,62 @@ import hashlib
 ARTIFACTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "artifacts")
 HEATMAPS_DIR = os.path.join(ARTIFACTS_DIR, "heatmaps")
 FRAMES_DIR = os.path.join(ARTIFACTS_DIR, "frames")
+AUDIO_DIR = os.path.join(ARTIFACTS_DIR, "audio")
 os.makedirs(HEATMAPS_DIR, exist_ok=True)
 os.makedirs(FRAMES_DIR, exist_ok=True)
+os.makedirs(AUDIO_DIR, exist_ok=True)
 
 def is_video_file(file_path: str) -> bool:
     if not file_path:
         return False
     ext = os.path.splitext(file_path)[1].lower()
     return ext in [".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v"]
+
+def is_audio_file(file_path: str) -> bool:
+    if not file_path:
+        return False
+    ext = os.path.splitext(file_path)[1].lower()
+    return ext in [".wav", ".mp3", ".ogg", ".flac", ".m4a", ".aac"]
+
+def extract_audio(media_path: str) -> Optional[str]:
+    """
+    Extracts 16kHz mono PCM WAV audio from video or audio file using imageio-ffmpeg.
+    Saves to artifacts/audio/{video_id}.wav.
+    Returns path to audio file if audio track exists, else None.
+    """
+    if not media_path or not os.path.exists(media_path):
+        return None
+
+    base_name = os.path.splitext(os.path.basename(media_path))[0]
+    hash_id = hashlib.md5(media_path.encode()).hexdigest()[:8]
+    audio_filename = f"{base_name}_{hash_id}.wav"
+    out_audio_path = os.path.join(AUDIO_DIR, audio_filename)
+
+    if os.path.exists(out_audio_path) and os.path.getsize(out_audio_path) > 1000:
+        return out_audio_path
+
+    try:
+        import subprocess
+        import imageio_ffmpeg
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+
+        cmd = [
+            ffmpeg_exe,
+            "-y",
+            "-i", media_path,
+            "-vn",
+            "-acodec", "pcm_s16le",
+            "-ar", "16000",
+            "-ac", "1",
+            out_audio_path
+        ]
+        result = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60)
+        if result.returncode == 0 and os.path.exists(out_audio_path) and os.path.getsize(out_audio_path) > 500:
+            return out_audio_path
+    except Exception as e:
+        print(f"Error extracting audio: {e}")
+
+    return None
 
 def get_media_info(file_path: str) -> Dict[str, Any]:
     """

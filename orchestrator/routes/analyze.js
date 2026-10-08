@@ -7,6 +7,7 @@ import { computeFusion } from '../services/fusion.js';
 import { recordAnalysis } from '../services/statsService.js';
 
 import path from 'path';
+import fs from 'fs';
 
 const storage = multer.diskStorage({
   destination: 'uploads/',
@@ -35,6 +36,14 @@ router.post('/', upload.single('file'), (req, res) => {
   } else if (req.body && (req.body.text || req.body.url)) {
     inputInfo = { text: req.body.text, url: req.body.url };
     inputType = req.body.text ? 'text' : 'url';
+    const textContent = req.body.text || req.body.url;
+    if (!fs.existsSync('uploads')) {
+      fs.mkdirSync('uploads', { recursive: true });
+    }
+    const textFileName = `text_${analysisId}.txt`;
+    const textPath = path.join('uploads', textFileName);
+    fs.writeFileSync(textPath, textContent, 'utf-8');
+    filePath = textPath;
   } else {
     return res.status(400).json({ error: 'No file or valid JSON body provided' });
   }
