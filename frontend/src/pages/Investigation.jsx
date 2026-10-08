@@ -149,7 +149,7 @@ const Investigation = () => {
                           verdict={effectiveFusion.verdict}
                           confidence={effectiveFusion.confidence}
                           confidenceLabel={effectiveFusion.confidenceLabel}
-                          isMock={true}
+                          isMock={Boolean(initialData?.inputInfo?.sample)}
                         />
                       </div>
                       <div className="lg:col-span-7">

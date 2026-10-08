@@ -57,3 +57,5 @@ ai-service/artifacts/*
 *.sw?
 .DS_Store
 Thumbs.db
+ai-service/scratch/
+scratch/
