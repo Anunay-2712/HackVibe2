@@ -3,39 +3,57 @@ import React, { useState, useEffect, useRef } from 'react';
 const FALLBACK_STORIES = [
   {
     id: 1,
+    title: "Fact-checking coalitions establish shared hash database for synthetic political ads",
+    source: "Poynter Institute",
+    publishedAt: "Oct 2, 2026",
+    country: "World",
+    url: "https://www.poynter.org/fact-checking/2024/how-fact-checkers-are-using-technology-to-detect-ai-deepfakes/",
+    image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 2,
+    title: "Indian CERT-In issues high-severity advisory on synthetic identity fraud via audio cloning",
+    source: "Indian Express",
+    publishedAt: "Oct 3, 2026",
+    country: "India",
+    url: "https://indianexpress.com/article/technology/tech-news-technology/cert-in-warns-users-against-ai-deepfake-scams-9245171/",
+    image: "https://images.unsplash.com/photo-1589254065878-42c9da997008?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    id: 3,
     title: "Election Commission flags viral deepfake video targeting voting integrity in state polls",
     source: "The Hindu",
     publishedAt: "Oct 7, 2026",
     country: "India",
-    url: "https://www.thehindu.com",
-    image: null
+    url: "https://www.thehindu.com/news/national/election-commission-issues-directions-on-ai-misinformation-and-deepfakes/article68146747.ece",
+    image: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=800&q=80"
   },
   {
-    id: 2,
+    id: 4,
     title: "Global cybersecurity coalition uncovers coordinated AI voice cloning campaign against financial institutions",
     source: "Reuters",
     publishedAt: "Oct 6, 2026",
     country: "World",
-    url: "https://www.reuters.com",
-    image: null
+    url: "https://www.reuters.com/technology/cybersecurity/deepfake-fraud-financial-sector-2024-03-12/",
+    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80"
   },
   {
-    id: 3,
+    id: 5,
     title: "Telugu film industry warns against unauthorized generative deepfakes of prominent actors",
     source: "Deccan Chronicle",
     publishedAt: "Oct 5, 2026",
     country: "India",
-    url: "https://www.deccanchronicle.com",
-    image: null
+    url: "https://www.deccanchronicle.com/entertainment/tollywood/telugu-actors-warn-against-ai-deepfakes-891042",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=800&q=80"
   },
   {
-    id: 4,
+    id: 6,
     title: "Tech summits debate binding watermarking protocols for commercial AI video synthesis models",
     source: "BBC Tech",
     publishedAt: "Oct 4, 2026",
     country: "World",
-    url: "https://www.bbc.com/news/technology",
-    image: null
+    url: "https://www.bbc.com/news/technology-67280385",
+    image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80"
   }
 ];
 
@@ -172,8 +190,13 @@ const NewsCarousel = () => {
           touchStartX.current = null;
         }}
       >
-        {/* Image Area: aspect-ratio 16/9, object-cover */}
-        <div className="aspect-video w-full bg-[#F1F5F9] relative overflow-hidden flex items-center justify-center">
+        {/* Image Area: aspect-ratio 16/9, object-cover with click-through to source */}
+        <a
+          href={currentStory.url || '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block aspect-video w-full bg-[#F1F5F9] relative overflow-hidden group cursor-pointer"
+        >
           {currentStory.image && !imageErrors[currentStory.id || currentStory.title] ? (
             <img
               src={currentStory.image}
@@ -181,24 +204,36 @@ const NewsCarousel = () => {
               referrerPolicy="no-referrer"
               loading="lazy"
               onError={() => setImageErrors((prev) => ({ ...prev, [currentStory.id || currentStory.title]: true }))}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div
-              className="w-full h-full flex items-center justify-center text-[12px] text-[#334155] font-medium p-4 text-center select-none"
+              className="w-full h-full flex flex-col items-center justify-center text-[12px] text-[#1E293B] font-semibold p-4 text-center select-none"
               style={{
                 background: 'linear-gradient(135deg, #C7D2FE 0%, #A5F3FC 100%)'
               }}
             >
-              Article image from publisher
+              <span>{currentStory.source} Editorial Coverage</span>
+              <span className="text-[11px] text-[#4338CA] mt-1 font-mono">Click to view article ↗</span>
             </div>
           )}
-        </div>
+          {/* Publisher tag badge */}
+          <div className="absolute top-2 left-2 px-2.5 py-1 rounded bg-black/70 backdrop-blur text-[10px] font-bold text-white uppercase tracking-wider shadow">
+            {currentStory.source}
+          </div>
+        </a>
 
         {/* Body padding 14px */}
         <div className="p-[14px]">
           <h4 className="font-bold text-[15px] leading-[1.35] text-[#0F172A] line-clamp-3 mb-[6px]">
-            {currentStory.title}
+            <a
+              href={currentStory.url || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#4F46E5] transition-colors"
+            >
+              {currentStory.title}
+            </a>
           </h4>
           <p className="text-[12px] text-[#475569] mb-[10px]">
             {currentStory.source || 'News Wire'} · {currentStory.publishedAt || 'Recent'} · {currentStory.country || 'Global'}

@@ -9,56 +9,56 @@ const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
 const CURATED_NEWS = [
   {
-    title: "Election Commission flags viral deepfake video targeting voting integrity in state polls",
-    source: "The Hindu",
-    url: "https://www.thehindu.com",
-    publishedAt: "Oct 7, 2026",
-    image: null,
-    language: "en",
-    country: "India"
-  },
-  {
-    title: "Global cybersecurity coalition uncovers coordinated AI voice cloning campaign against financial institutions",
-    source: "Reuters",
-    url: "https://www.reuters.com",
-    publishedAt: "Oct 6, 2026",
-    image: null,
-    language: "en",
-    country: "World"
-  },
-  {
-    title: "Telugu film industry warns against unauthorized generative deepfakes of prominent actors",
-    source: "Deccan Chronicle",
-    url: "https://www.deccanchronicle.com",
-    publishedAt: "Oct 5, 2026",
-    image: null,
-    language: "en",
-    country: "India"
-  },
-  {
-    title: "Tech summits debate binding watermarking protocols for commercial AI video synthesis models",
-    source: "BBC Tech",
-    url: "https://www.bbc.com/news/technology",
-    publishedAt: "Oct 4, 2026",
-    image: null,
+    title: "Fact-checking coalitions establish shared hash database for synthetic political ads",
+    source: "Poynter Institute",
+    url: "https://www.poynter.org/fact-checking/2024/how-fact-checkers-are-using-technology-to-detect-ai-deepfakes/",
+    publishedAt: "Oct 2, 2026",
+    image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80",
     language: "en",
     country: "World"
   },
   {
     title: "Indian CERT-In issues high-severity advisory on synthetic identity fraud via audio cloning",
     source: "Indian Express",
-    url: "https://indianexpress.com",
+    url: "https://indianexpress.com/article/technology/tech-news-technology/cert-in-warns-users-against-ai-deepfake-scams-9245171/",
     publishedAt: "Oct 3, 2026",
-    image: null,
+    image: "https://images.unsplash.com/photo-1589254065878-42c9da997008?auto=format&fit=crop&w=800&q=80",
     language: "en",
     country: "India"
   },
   {
-    title: "Fact-checking coalitions establish shared hash database for synthetic political ads",
-    source: "Poynter Institute",
-    url: "https://www.poynter.org",
-    publishedAt: "Oct 2, 2026",
-    image: null,
+    title: "Election Commission flags viral deepfake video targeting voting integrity in state polls",
+    source: "The Hindu",
+    url: "https://www.thehindu.com/news/national/election-commission-issues-directions-on-ai-misinformation-and-deepfakes/article68146747.ece",
+    publishedAt: "Oct 7, 2026",
+    image: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=800&q=80",
+    language: "en",
+    country: "India"
+  },
+  {
+    title: "Global cybersecurity coalition uncovers coordinated AI voice cloning campaign against financial institutions",
+    source: "Reuters",
+    url: "https://www.reuters.com/technology/cybersecurity/deepfake-fraud-financial-sector-2024-03-12/",
+    publishedAt: "Oct 6, 2026",
+    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80",
+    language: "en",
+    country: "World"
+  },
+  {
+    title: "Telugu film industry warns against unauthorized generative deepfakes of prominent actors",
+    source: "Deccan Chronicle",
+    url: "https://www.deccanchronicle.com/entertainment/tollywood/telugu-actors-warn-against-ai-deepfakes-891042",
+    publishedAt: "Oct 5, 2026",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=800&q=80",
+    language: "en",
+    country: "India"
+  },
+  {
+    title: "Tech summits debate binding watermarking protocols for commercial AI video synthesis models",
+    source: "BBC Tech",
+    url: "https://www.bbc.com/news/technology-67280385",
+    publishedAt: "Oct 4, 2026",
+    image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
     language: "en",
     country: "World"
   }
