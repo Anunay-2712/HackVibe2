@@ -15,9 +15,11 @@ const CLAIM_AGENTS = [
   { name: 'claim_judge', track: 'claim' }
 ];
 
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+
 async function callAgent(agent, absolutePath, sampleName, inputType, onAgentDone) {
   try {
-    const response = await fetch(`http://localhost:8000/agents/${agent.name}`, {
+    const response = await fetch(`${AI_SERVICE_URL}/agents/${agent.name}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
