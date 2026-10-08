@@ -1,7 +1,7 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
+import { Shield, HelpCircle } from 'lucide-react';
 
-const Navbar = ({ onStartInvestigation }) => {
+const Navbar = ({ onOpenAbout }) => {
   return (
     <header className="h-[68px] border-b border-[#E2E8F0] bg-white sticky top-0 z-40">
       <div className="max-w-[1440px] mx-auto h-full px-[32px] flex items-center justify-between">
@@ -43,13 +43,14 @@ const Navbar = ({ onStartInvestigation }) => {
           </a>
         </nav>
 
-        {/* Right: primary button "Start investigation" */}
+        {/* Right: "About" button */}
         <div className="flex items-center">
           <button
-            onClick={onStartInvestigation}
-            className="bg-[#4F46E5] hover:bg-[#4338CA] text-white font-bold text-[14px] py-[12px] px-[20px] rounded-[10px] transition-colors focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:ring-offset-2 cursor-pointer"
+            onClick={onOpenAbout}
+            className="flex items-center gap-2 bg-[#EEF2FF] hover:bg-[#E0E7FF] text-[#4338CA] border border-indigo-200 font-bold text-[14px] py-[10px] px-[18px] rounded-[10px] transition-all focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow"
           >
-            Start investigation
+            <HelpCircle className="w-4 h-4 text-[#4F46E5]" />
+            <span>About DeepTrace</span>
           </button>
         </div>
       </div>

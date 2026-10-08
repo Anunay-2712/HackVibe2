@@ -1,9 +1,7 @@
 {
-  "analysesToday": 51,
+  "analysesToday": 63,
   "durations": [
-    2.3,
-    2.3,
-    2.3,
+    2.1,
     2.3,
     2.3,
     2.1,
@@ -12,21 +10,23 @@
     2.3,
     2.1,
     2.3,
-    2.3,
     2.1,
-    2.3,
     2.3,
     2.1,
     2.1,
+    2.1,
     2.3,
     2.3,
-    2.1
+    2.3,
+    2.3,
+    2.3,
+    2.3
   ],
   "avgTime": "2.2s",
   "verdictMix": {
-    "real": 27,
-    "inconclusive": 13,
+    "real": 30,
+    "inconclusive": 22,
     "fake": 11
   },
-  "lastUpdated": "2026-10-08T15:13:12.027Z"
+  "lastUpdated": "2026-10-08T18:59:49.911Z"
 }

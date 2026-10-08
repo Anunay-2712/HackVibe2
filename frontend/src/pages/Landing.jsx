@@ -8,9 +8,11 @@ import HowItWorks from '../components/HowItWorks';
 import FeaturesCard from '../components/FeaturesCard';
 import UsageCard from '../components/UsageCard';
 import LiveStatusCard from '../components/LiveStatusCard';
+import AboutModal from '../components/AboutModal';
 
 const Landing = () => {
   const [selectedToolMode, setSelectedToolMode] = useState(null);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   const handleStartInvestigation = () => {
     // Smoothly scroll to the input card and focus it
@@ -32,7 +34,14 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-white text-[#0F172A] font-sans antialiased">
       {/* NAVBAR (height 68px, bottom border 1px #E2E8F0, flex, space-between, vertically centered) */}
-      <Navbar onStartInvestigation={handleStartInvestigation} />
+      <Navbar onOpenAbout={() => setIsAboutOpen(true)} />
+
+      {/* About Modal */}
+      <AboutModal
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
+        onStartInvestigation={handleStartInvestigation}
+      />
 
       {/* PAGE CONTAINER: max-width 1440px, centered, horizontal padding 32px, bottom padding 40px */}
       <main className="max-w-[1440px] mx-auto px-[32px] pb-[40px]">
