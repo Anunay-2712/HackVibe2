@@ -13,11 +13,11 @@ async def analyze(file_path: str, sample_name: str = None) -> dict:
         }
     else:
         return {
-            "score": 0.65,
-            "confidence": 0.7,
-            "summary": "Missing EXIF data and unusual software tags detected.",
+            "score": 0.40,
+            "confidence": 0.35,
+            "summary": "Missing EXIF provenance. Social platforms frequently strip metadata, giving low confidence.",
             "evidence": [
-                EvidenceItem(label="Metadata", detail="Software tag indicates 'Photoshop' or unknown tool.")
+                EvidenceItem(label="Metadata", detail="Container metadata stripped; no verified camera provenance.")
             ],
             "artifacts": {}
         }

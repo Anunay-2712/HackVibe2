@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-import { createAnalysis, getAnalysis, updateAgent, setFusion, listSamples } from '../store.js';
+import { createAnalysis, getAnalysis, updateAgent, setFusion, setReport, listSamples } from '../store.js';
 import { runAllAgents } from '../services/agentRunner.js';
 import { computeFusion } from '../services/fusion.js';
 
@@ -36,6 +36,9 @@ router.post('/', upload.single('file'), (req, res) => {
   }).then((results) => {
     const fusionResult = computeFusion(results);
     setFusion(analysisId, fusionResult);
+    if (fusionResult.judgeReport) {
+      setReport(analysisId, fusionResult.judgeReport);
+    }
   });
 
   res.json({ analysisId });
@@ -58,6 +61,9 @@ router.post('/sample/:name', (req, res) => {
   }).then((results) => {
     const fusionResult = computeFusion(results);
     setFusion(analysisId, fusionResult);
+    if (fusionResult.judgeReport) {
+      setReport(analysisId, fusionResult.judgeReport);
+    }
   });
 
   res.json({ analysisId });
